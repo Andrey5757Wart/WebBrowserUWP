@@ -1,0 +1,52 @@
+﻿<Page
+    x:Class="WebBrowserUWP.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"    
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:Controls="using:Microsoft.UI.Xaml.Controls"
+    xmlns:i="using:Microsoft.Xaml.Interactivity" 
+    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" DataContext="{Binding Main, Source={StaticResource Locator}}"> 
+    <Page.TopAppBar>
+        <CommandBar>
+            <CommandBar.Content>
+                <StackPanel Orientation="Horizontal">
+                    <AutoSuggestBox x:Name="searchtextbox"  ItemsSource="{Binding SelectedItem.ShowResultsList, Mode=OneWay}" IsSuggestionListOpen="{Binding SelectedItem.IsSuggestionOpen, Mode=OneWay}" QueryIcon="Find" Text="{Binding SelectedItem.SearchBox, Mode=TwoWay}" MaxHeight="32" Margin="7, 5, 0, 0" MinWidth="600" MaxWidth="600" PlaceholderText="Введите адрес сайта или поисковый запрос">
+                        <i:Interaction.Behaviors>
+                            <core:EventTriggerBehavior EventName="SuggestionChosen">
+                                <core:InvokeCommandAction Command="{Binding SelectedItem.NavigateResult, Mode=OneWay}"/>
+                            </core:EventTriggerBehavior>
+                            <core:EventTriggerBehavior EventName="TextChanged">
+                                <core:InvokeCommandAction Command="{Binding SelectedItem.SearchChanged, Mode=OneWay}" CommandParameter="{Binding Text, ElementName=searchtextbox}"/>
+                            </core:EventTriggerBehavior>
+                            <core:EventTriggerBehavior EventName="QuerySubmitted">
+                                <core:InvokeCommandAction Command="{Binding SelectedItem.Enter, Mode=OneWay}"/>
+                            </core:EventTriggerBehavior>
+                                            
+                        </i:Interaction.Behaviors>                      
+                    </AutoSuggestBox>
+                </StackPanel>
+            </CommandBar.Content>
+            <CommandBar.PrimaryCommands>
+                <AppBarButton Label="Bach" Command="{Binding SelectedItem.GoBack, Mode=OneWay}" IsEnabled="{Binding SelectedItem.WebContent.CanGoBack, Mode=OneWay}" Icon="Back"/>
+                <AppBarButton Label="Forward" Command="{Binding SelectedItem.GoForward, Mode=OneWay}" IsEnabled="{Binding SelectedItem.WebContent.CanGoForward, Mode=OneWay}" Icon="Forward"/>
+                <AppBarButton Label="Reload" Command="{Binding SelectedItem.Reload, Mode=OneWay}" Icon="Refresh"/>
+            </CommandBar.PrimaryCommands>
+          
+        </CommandBar>
+    </Page.TopAppBar>
+    <Grid>
+        <Grid.RowDefinitions>           
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Controls:TabView x:Name="tabView" AddTabButtonCommand="{Binding AddTabCommand, Mode=OneWay}" TabItemsSource="{Binding TabsView, Mode=OneWay}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" VerticalAlignment="Stretch" Grid.Row="1">
+            <i:Interaction.Behaviors >
+                <core:EventTriggerBehavior EventName="TabCloseRequested">
+                    <core:InvokeCommandAction Command="{Binding RemoveTabCommand}"/>
+                </core:EventTriggerBehavior>
+            </i:Interaction.Behaviors>
+        </Controls:TabView>
+    </Grid>
+</Page>
